@@ -1,6 +1,6 @@
 # CppGame
 This is a simple library for rendering and simulation in 2D. CppGame also has a nice banner.
-![CppGameBanner]("Banner.png")
+![CppGameBanner](Banner.png)
 
 # Usage
 
