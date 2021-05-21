@@ -3286,6 +3286,7 @@ void ImplOpenGLRender() {
 #pragma comment(lib, "Avrt.lib")
 #pragma comment(lib, "Winmm.lib")
 #pragma comment(lib, "OpenGL32.lib")
+#pragma comment(lib, "shell32.lib")
 
 static WINDOWPLACEMENT g_WindowPlacement;
 static Platform g_Platform;
