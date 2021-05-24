@@ -139,7 +139,7 @@ CppGameCall void CppGameInitialize(Platform *platform, int argc, char **argv) {
 	for (uint32_t index = 0; index < MAX_BOIDS; ++index) {
 		auto b = boids + index;
 		b->Position = Vec2(w * (float)((float)rand() / (float)RAND_MAX), (float)h * (float)((float)rand() / (float)RAND_MAX));
-		b->Velocity = 100 * Vec2(2 * (float)((float)rand() / (float)RAND_MAX) - 1, 2 * (float)((float)rand() / (float)RAND_MAX) - 1);
+		b->Velocity = Vec2(0);
 	}
 
 	obstacles[0].Position = 0.5f * Vec2(w, h);
@@ -153,4 +153,17 @@ CppGameCall void CppGameInitialize(Platform *platform, int argc, char **argv) {
 	obstacles[3].Radius = 55;
 	obstacles[4].Position = Vec2(0.75f * w, 0.25f * h);
 	obstacles[4].Radius = 55;
+
+	// Get the boids out of obstacles
+	for (uint32_t i = 0; i < MAX_BOIDS; ++i) {
+		auto boid = boids + i;
+		for (uint32_t index = 0; index < ArrayCount(obstacles); ++index) {
+			if (LengthSq(boid->Position - obstacles[index].Position) <= Square(obstacles[index].Radius)) {
+				float t = obstacles[index].Radius / Length(boid->Position - obstacles[index].Position);
+				Vec2  tang = obstacles[index].Position - boid->Position;
+				Vec2  norm = NormalizeChecked(Vec2(-tang.y, tang.x));
+				boid->Position -= t * NormalizeChecked(tang);
+			}
+		}
+	}
 }

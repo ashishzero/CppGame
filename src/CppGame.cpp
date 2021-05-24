@@ -2930,6 +2930,7 @@ extern "C" {
 	typedef void (APIENTRYP PFNGLBUFFERSUBDATAPROC) (GLenum target, GLintptr offset, GLsizeiptr size, const void *data);
 	typedef void (APIENTRYP PFNGLUSEPROGRAMPROC) (GLuint program);
 	typedef void (APIENTRYP PFNGLENABLEPROC) (GLenum cap);
+	typedef void (APIENTRYP PFNGLGLBLENDFUNCPROC) (GLenum sfactor, GLenum dfactor);
 	typedef void (APIENTRYP PFNGLUNIFORMMATRIX4FVPROC) (GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 	typedef void (APIENTRYP PFNGLUNIFORM1IPROC) (GLint location, GLint v0);
 	typedef void (APIENTRYP PFNGLDRAWELEMENTSBASEVERTEXPROC) (GLenum mode, GLsizei count, GLenum type, const void *indices, GLint basevertex);
@@ -2976,6 +2977,7 @@ static PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 static PFNGLBUFFERSUBDATAPROC glBufferSubData;
 static PFNGLUSEPROGRAMPROC glUseProgram;
 static PFNGLENABLEPROC glEnable;
+static PFNGLGLBLENDFUNCPROC glBlendFunc;
 static PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 static PFNGLUNIFORM1IPROC glUniform1i;
 static PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex;
@@ -3017,6 +3019,7 @@ bool LoadOpenGLFunctions(GLLoader load) {
 	GL_LOAD_FUNC(glBufferSubData, PFNGLBUFFERSUBDATAPROC);
 	GL_LOAD_FUNC(glUseProgram, PFNGLUSEPROGRAMPROC);
 	GL_LOAD_FUNC(glEnable, PFNGLENABLEPROC);
+	GL_LOAD_FUNC(glBlendFunc, PFNGLGLBLENDFUNCPROC);
 	GL_LOAD_FUNC(glUniformMatrix4fv, PFNGLUNIFORMMATRIX4FVPROC);
 	GL_LOAD_FUNC(glUniform1i, PFNGLUNIFORM1IPROC);
 	GL_LOAD_FUNC(glDrawElementsBaseVertex, PFNGLDRAWELEMENTSBASEVERTEXPROC);
@@ -3209,6 +3212,7 @@ void ImplOpenGLInitializeRenderer2D(Platform *platform) {
 	SetDefaultTexture(tex);
 
 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_SCISSOR_TEST);
 }
 
