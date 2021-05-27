@@ -755,7 +755,9 @@ void DrawArcOutline(Vec2 position, float radius, float theta_a, float theta_b, V
 
 void DrawPolygonOutline(const Vec2 *vertices, uint32_t count, Vec4 color);
 
+uint8_t *LoadBMPFromFile(struct Platform *p, const char *file, int *w, int *h);
 uint32_t CreateTexture(uint8_t *pixels, uint32_t width, uint32_t height, uint32_t channels);
+uint32_t CreateTextureFromFile(struct Platform *platform, const char *file);
 void DestroyTexture(uint32_t tex);
 
 //
@@ -791,6 +793,7 @@ struct MouseState {
 	bool     IsDown[_ButtonCount];
 	bool     WasDown[_ButtonCount];
 	uint32_t Transitions[_ButtonCount];
+	uint32_t DoubleClick[_ButtonCount];
 };
 
 struct KeyboardState {
@@ -848,9 +851,11 @@ struct Platform {
 inline void PlatformQuit(Platform *p) { p->Running = false; }
 
 inline bool KeyIsDown(Platform *p, Key k) { return p->Keyboard.IsDown[k]; }
-inline bool KeyIsPressed(Platform *p, Key k) { return p->Keyboard.IsDown[k] && !p->Keyboard.WasDown[k]; }
+inline bool KeyIsPressed(Platform *p, Key k) { return p->Keyboard.IsDown[k] && !p->Keyboard.Repeat[k]; }
+inline bool KeyIsReleased(Platform *p, Key k) { return !p->Keyboard.IsDown[k] && p->Keyboard.WasDown[k]; }
 inline bool ButtonIsDown(Platform *p, Button b) { return p->Mouse.IsDown[b]; }
 inline bool ButtonIsPressed(Platform *p, Button b) { return p->Mouse.IsDown[b] && !p->Mouse.WasDown[b]; }
+inline bool ButtonIsReleased(Platform *p, Button b) { return p->Mouse.WasDown[b] && !p->Mouse.IsDown[b]; }
 
 #define CppGameCall extern "C"
 CppGameCall void CppGameInitialize(Platform * platform, int argc, char **argv);
