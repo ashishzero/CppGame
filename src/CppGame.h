@@ -857,5 +857,8 @@ inline bool ButtonIsDown(Platform *p, Button b) { return p->Mouse.IsDown[b]; }
 inline bool ButtonIsPressed(Platform *p, Button b) { return p->Mouse.IsDown[b] && !p->Mouse.WasDown[b]; }
 inline bool ButtonIsReleased(Platform *p, Button b) { return p->Mouse.WasDown[b] && !p->Mouse.IsDown[b]; }
 
+// Interface to load PNG file
+unsigned char* LoadPNGFile(Platform* p, const char* img_path, unsigned* width, unsigned* height, unsigned* no_of_channels, unsigned* bit_depth);
+
 #define CppGameCall extern "C"
 CppGameCall void CppGameInitialize(Platform * platform, int argc, char **argv);
