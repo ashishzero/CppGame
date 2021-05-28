@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+namespace CppBoid {
+
 const uint32_t MAX_BOIDS = 200;
 
 struct Boid {
@@ -96,7 +98,7 @@ void FixedUpdate(Platform *p, float dt) {
 }
 
 void UpdateAndRender(Platform *p, float dt, float alpha) {
-	if (KeyIsPressed(p, KeyEscape)) {
+	if (KeyIsPressed(p, Key_Escape)) {
 		PlatformQuit(p);
 	}
 
@@ -124,11 +126,24 @@ void UpdateAndRender(Platform *p, float dt, float alpha) {
 	EndScene2D();
 }
 
-CppGameCall void CppGameInitialize(Platform *platform, int argc, char **argv) {
-	platform->Name = "Boids";
-	platform->FixedUpdate = FixedUpdate;
-	platform->UpdateAndRender = UpdateAndRender;
+void PlaceObstacles(Platform *platform, uint32_t rw, uint32_t rh) {
+	float w = (float)rw;
+	float h = (float)rh;
 
+	obstacles[0].Position = 0.5f * Vec2(w, h);
+	obstacles[0].Radius = 50;
+	obstacles[1].Position = 0.25f * Vec2(w, h);
+	obstacles[1].Radius = 55;
+	obstacles[2].Position = 0.75f * Vec2(w, h);
+	obstacles[2].Radius = 55;
+
+	obstacles[3].Position = Vec2(0.25f * w, 0.75f * h);
+	obstacles[3].Radius = 55;
+	obstacles[4].Position = Vec2(0.75f * w, 0.25f * h);
+	obstacles[4].Radius = 55;
+}
+
+bool OnLoad(Platform *platform) {
 	srand((uint32_t)time(0));
 
 	boids = (Boid *)platform->Alloc(sizeof(Boid) * MAX_BOIDS);
@@ -142,17 +157,7 @@ CppGameCall void CppGameInitialize(Platform *platform, int argc, char **argv) {
 		b->Velocity = Vec2(0);
 	}
 
-	obstacles[0].Position = 0.5f * Vec2(w, h);
-	obstacles[0].Radius = 50;
-	obstacles[1].Position = 0.25f * Vec2(w, h);
-	obstacles[1].Radius = 55;
-	obstacles[2].Position = 0.75f * Vec2(w, h);
-	obstacles[2].Radius = 55;
-
-	obstacles[3].Position = Vec2(0.25f * w, 0.75f * h);
-	obstacles[3].Radius = 55;
-	obstacles[4].Position = Vec2(0.75f * w, 0.25f * h);
-	obstacles[4].Radius = 55;
+	PlaceObstacles(platform, (uint32_t)platform->RenderTargetWidth, (uint32_t)platform->RenderTargetHeight);
 
 	// Get the boids out of obstacles
 	for (uint32_t i = 0; i < MAX_BOIDS; ++i) {
@@ -166,4 +171,20 @@ CppGameCall void CppGameInitialize(Platform *platform, int argc, char **argv) {
 			}
 		}
 	}
+
+	return true;
 }
+
+}
+
+#if !defined(CPP_EXAMPLE_MENU)
+
+CppGameCall void CppGameInitialize(Platform *platform, int argc, char **argv) {
+	platform->Name = "Boids";
+	platform->OnLoad = CppBoid::OnLoad;
+	platform->OnWindowResize = CppBoid::PlaceObstacles;
+	platform->FixedUpdate = CppBoid::FixedUpdate;
+	platform->UpdateAndRender = CppBoid::UpdateAndRender;
+}
+
+#endif
