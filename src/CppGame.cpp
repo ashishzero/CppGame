@@ -3036,6 +3036,10 @@ int fixed(struct state* s)
 // Platform
 //
 
+bool PlatformOnLoadStub(Platform *) {
+	return true;
+}
+
 void PlatformFixedUpdateStub(Platform *, float dt) {
 
 }
@@ -3783,6 +3787,7 @@ extern "C" {
 	typedef void (APIENTRYP PFNGLBINDBUFFERPROC) (GLenum target, GLuint buffer);
 	typedef void (APIENTRYP PFNGLBUFFERDATAPROC) (GLenum target, GLsizeiptr size, const void *data, GLenum usage);
 	typedef void (APIENTRYP PFNGLGENTEXTURESPROC) (GLsizei n, GLuint *textures);
+	typedef void (APIENTRYP PFNGLTEXPARAMETERIPROC) (GLenum target, GLenum pname, GLint param);
 	typedef void (APIENTRYP PFNGLBINDTEXTUREPROC) (GLenum target, GLuint texture);
 	typedef void (APIENTRYP PFNGLDELETETEXTURESPROC) (GLsizei n, const GLuint *textures);
 	typedef void (APIENTRYP PFNGLTEXIMAGE2DPROC) (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
@@ -3833,6 +3838,7 @@ static PFNGLGENTEXTURESPROC glGenTextures;
 static PFNGLBINDTEXTUREPROC glBindTexture;
 static PFNGLDELETETEXTURESPROC glDeleteTextures;
 static PFNGLTEXIMAGE2DPROC glTexImage2D;
+static PFNGLTEXPARAMETERIPROC glTexParameteri;
 static PFNGLCREATESHADERPROC glCreateShader;
 static PFNGLSHADERSOURCEPROC glShaderSource;
 static PFNGLCOMPILESHADERPROC glCompileShader;
@@ -3875,6 +3881,7 @@ bool LoadOpenGLFunctions(GLLoader load) {
 	GL_LOAD_FUNC(glBindTexture, PFNGLBINDTEXTUREPROC);
 	GL_LOAD_FUNC(glDeleteTextures, PFNGLDELETETEXTURESPROC);
 	GL_LOAD_FUNC(glTexImage2D, PFNGLTEXIMAGE2DPROC);
+	GL_LOAD_FUNC(glTexParameteri, PFNGLTEXPARAMETERIPROC);
 	GL_LOAD_FUNC(glCreateShader, PFNGLCREATESHADERPROC);
 	GL_LOAD_FUNC(glShaderSource, PFNGLSHADERSOURCEPROC);
 	GL_LOAD_FUNC(glCompileShader, PFNGLCOMPILESHADERPROC);
@@ -3977,6 +3984,10 @@ uint32_t CreateTexture(uint8_t *pixels, uint32_t width, uint32_t height, uint32_
 	glGenTextures(1, &texid);
 	glBindTexture(GL_TEXTURE_2D, texid);
 	glTexImage2D(GL_TEXTURE_2D, 0, gl_internal_format, width, height, 0, gl_format, GL_UNSIGNED_BYTE, pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return texid;
@@ -4128,9 +4139,6 @@ void ImplOpenGLRender() {
 
 		auto queue = GetDraw2DListQueue();
 
-		glActiveTexture(GL_TEXTURE0);
-		glUniform1i(g_OpenGL.TexImageLocation, 0);
-
 		for (auto &cmd_list : queue) {
 			glUniformMatrix4fv(g_OpenGL.ProjectionLocation, 1, GL_TRUE, cmd_list.ViewTransform.m);
 
@@ -4144,6 +4152,8 @@ void ImplOpenGLRender() {
 
 				glScissor(x, y, w, h);
 				glBindTexture(GL_TEXTURE_2D, cmd->Texture);
+				glActiveTexture(GL_TEXTURE0);
+				glUniform1i(g_OpenGL.TexImageLocation, 0);
 
 				glDrawElementsBaseVertex(GL_TRIANGLES, cmd->IndexCount, GL_UNSIGNED_INT,
 										 (void *)(cmd->IndexOffset * sizeof(GLuint)), (GLint)cmd->VertexOffset);
@@ -4519,7 +4529,7 @@ LRESULT CALLBACK WindowProcedure(HWND wnd, UINT msg, WPARAM wparam,
 			PostQuitMessage(0);
 		} break;
 
-		case WM_MOVE:
+		case WM_MOUSEMOVE:
 		{
 			RECT rc;
 			GetClientRect(wnd, &rc);
@@ -4715,6 +4725,7 @@ int main(int argc, char **argv) {
 	g_Platform.Time.RealTime = 0;
 	g_Platform.Time.SimulationSpeedFactor = 1;
 
+	g_Platform.OnLoad = PlatformOnLoadStub;
 	g_Platform.FixedUpdate = PlatformFixedUpdateStub;
 	g_Platform.UpdateAndRender = PlatformUpdateAndRenderStub;
 	g_Platform.OnWindowResize = PlatformOnWindowResizeStub;
@@ -4725,6 +4736,7 @@ int main(int argc, char **argv) {
 
 	if (g_Platform.Running == false) return 0;
 
+	if (!g_Platform.OnLoad) g_Platform.OnLoad = PlatformOnLoadStub;
 	if (!g_Platform.FixedUpdate) g_Platform.FixedUpdate = PlatformFixedUpdateStub;
 	if (!g_Platform.UpdateAndRender) g_Platform.UpdateAndRender = PlatformUpdateAndRenderStub;
 	if (!g_Platform.OnWindowResize) g_Platform.OnWindowResize = PlatformOnWindowResizeStub;
@@ -4787,6 +4799,9 @@ int main(int argc, char **argv) {
 	LoadOpenGL(window);
 
 	ImplOpenGLInitializeRenderer2D(&g_Platform);
+
+	if (!g_Platform.OnLoad(&g_Platform))
+		return 1;
 
 	float accumulator = dt;
 

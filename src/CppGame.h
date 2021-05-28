@@ -816,6 +816,7 @@ typedef void *(*PlatformAlloc)(size_t size);
 typedef void *(*PlatformRealloc)(void *ptr, size_t size);
 typedef void (*PlatformFree)(void *ptr);
 typedef void (*PlatformOnWindowResize)(struct Platform *, uint32_t w, uint32_t h);
+typedef bool (*PlatformOnLoad)(struct Platform *);
 typedef void (*PlatformFixedUpdate)(struct Platform *, float dt);
 typedef void (*PlatformUpdateAndRender)(struct Platform *, float dt, float alpha);
 typedef void (*PlatformLog)(const char *fmt, ...);
@@ -840,6 +841,7 @@ struct Platform {
 	float AspectRatio;
 
 	Timestep Time;
+	PlatformOnLoad OnLoad;
 	PlatformFixedUpdate FixedUpdate;
 	PlatformUpdateAndRender UpdateAndRender;
 	PlatformOnWindowResize OnWindowResize;
