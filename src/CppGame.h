@@ -755,8 +755,7 @@ void DrawArcOutline(Vec2 position, float radius, float theta_a, float theta_b, V
 
 void DrawPolygonOutline(const Vec2 *vertices, uint32_t count, Vec4 color);
 
-uint8_t *LoadBMPFromFile(struct Platform *p, const char *file, int *w, int *h);
-uint8_t* LoadPNGFile(Platform* p, const char* img_path, unsigned* width, unsigned* height, unsigned* no_of_channels, unsigned* bit_depth);
+uint8_t* LoadPNGFile(struct Platform* p, const char* img_path, unsigned* width, unsigned* height, unsigned* no_of_channels, unsigned* bit_depth);
 
 uint32_t CreateTexture(uint8_t *pixels, uint32_t width, uint32_t height, uint32_t channels);
 uint32_t CreateTextureFromFile(struct Platform *platform, const char *file);
