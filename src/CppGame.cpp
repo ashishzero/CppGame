@@ -2411,7 +2411,7 @@ unsigned char paethPredictor(unsigned char a, unsigned char b, unsigned char c)
 void reverse_filter(Platform* p, const unsigned char* data, unsigned len, pngInfo* image_info)
 {
 	// Demo for only color_type 6 i.e true color with alpha channel
-	if (image_info->color_type == 2 || image_info->color_type == 6)
+	if (!(image_info->color_type == 2 || image_info->color_type == 6))
 	{
 		image_info->count = 0;
 		image_info->image_data = NULL;
@@ -2522,7 +2522,9 @@ unsigned char* LoadPNGFile(Platform* p, const char* img_path, unsigned* width, u
 	unsigned size = fread(buf, 1, MAX_SIZE, image_file);
 	if (size == MAX_SIZE)
 	{
+		// Memory leak here
 		fprintf(stderr, "Not enough memory allocated...");
+		p->Free(buf);
 		return NULL;
 	}
 	// Allocate buffer for deflate stream
@@ -2587,11 +2589,11 @@ unsigned char* LoadPNGFile(Platform* p, const char* img_path, unsigned* width, u
 	unsigned decomp_len = MAX_SIZE;
 
 	//// It decompresses the deflate stream, writes it into decomp_data and writes total length of output stram in decomp_len integer
-	//if (deflate(deflate_stream + 2, deflate_len, decomp_data, &decomp_len))
-	//{
-	//	fprintf(stderr, "Failed the deflate decompression..");
-	//	return NULL;
-	//}
+	if (deflate(deflate_stream + 2, deflate_len, decomp_data, &decomp_len))
+	{
+		fprintf(stderr, "Failed the deflate decompression..");
+		return NULL;
+	}
 	fprintf(stderr, "\nDecomped len is : %d.", decomp_len);
 	// Apply adler32 checksum on the decomp_data and vertify it
 	unsigned char* at_last = deflate_stream + deflate_len;
