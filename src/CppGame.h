@@ -765,42 +765,45 @@ void DestroyTexture(uint32_t tex);
 //
 
 enum Key : uint32_t {
-	KeyA, KeyB, KeyC, KeyD, KeyE, KeyF, KeyG, KeyH, KeyI, KeyJ, KeyK, KeyL, KeyM, KeyN,
-	KeyO, KeyP, KeyQ, KeyR, KeyS, KeyT, KeyU, KeyV, KeyW, KeyX, KeyY, KeyZ, Key0, Key1,
-	Key2, Key3, Key4, Key5, Key6, Key7, Key8, Key9,
-	KeyReturn, KeyEscape, KeyBackSpace, KeyTab, KeySpace, KeyShift, KeyCtrl,
-	KeyF1, KeyF2, KeyF3, KeyF4, KeyF5, KeyF6, KeyF7, KeyF8, KeyF9, KeyF10, KeyF11, KeyF12,
-	KeyPrintScreen, KeyInsert, KeyHome, KeyPageUp, KeyPageDown, KeyDelete, KeyEnd,
-	KeyRight, KeyLeft, KeyDown, KeyUp, KeyDivide, KeyMultiply, KeyMinus, KeyPlus,
-	KeyPeriod, KeyBackTick, KeyPad0, KeyPad1, KeyPad2, KeyPad3, KeyPad4, KeyPad5,
-	KeyPad6, KeyPad7, KeyPad8, KeyPad9,
+	Key_A, Key_B, Key_C, Key_D, Key_E, Key_F, Key_G, Key_H, Key_I, Key_J, Key_K, Key_L, Key_M,
+	Key_N, Key_O, Key_P, Key_Q, Key_R, Key_S, Key_T, Key_U, Key_V, Key_W, Key_X, Key_Y, Key_Z,
+	Key_0, Key_1, Key_2, Key_3, Key_4, Key_5, Key_6, Key_7, Key_8, Key_9,
+	Key_Return, Key_Escape, Key_BackSpace, Key_Tab, Key_Space, Key_Shift, Key_Ctrl,
+	Key_F1, Key_F2, Key_F3, Key_F4, Key_F5, Key_F6, Key_F7, Key_F8, Key_F9, Key_F10, Key_F11, Key_F12,
+	Key_PrintScreen, Key_Insert, Key_Home, Key_PageUp, Key_PageDown, Key_Delete, Key_End,
+	Key_Right, Key_Left, Key_Down, Key_Up,
+	Key_Divide, Key_Multiply, Key_Minus, Key_Plus, Key_Period, Key_BackTick,
+	Key_Pad0, Key_Pad1, Key_Pad2, Key_Pad3, Key_Pad4,
+	Key_Pad5, Key_Pad6, Key_Pad7, Key_Pad8, Key_Pad9,
 
-	_KeyCount
+	_Key_Count
 };
 
 enum Button {
-	ButtonLeft,
-	ButtonMiddle,
-	ButtonRight,
+	Button_Left,
+	Button_Middle,
+	Button_Right,
 
-	_ButtonCount
+	_Button_Count
 };
 
 struct MouseState {
 	Vec2     Position;
 	Vec2     Delta;
 	Vec2	 Scroll;
-	bool     IsDown[_ButtonCount];
-	bool     WasDown[_ButtonCount];
-	uint32_t Transitions[_ButtonCount];
-	uint32_t DoubleClick[_ButtonCount];
+	bool     IsDown[_Button_Count];
+	bool	 EndedDown[_Key_Count];
+	bool	 EndedUp[_Key_Count];
+	uint32_t Transitions[_Button_Count];
+	uint32_t DoubleClick[_Button_Count];
 };
 
 struct KeyboardState {
-	bool     IsDown[_KeyCount];
-	bool     WasDown[_KeyCount];
-	uint32_t Repeat[_KeyCount];
-	uint32_t Transitions[_KeyCount];
+	bool     IsDown[_Key_Count];
+	bool	 EndedDown[_Key_Count];
+	bool	 EndedUp[_Key_Count];
+	uint32_t Repeat[_Key_Count];
+	uint32_t Transitions[_Key_Count];
 };
 
 struct Timestep {
@@ -817,6 +820,7 @@ typedef void *(*PlatformRealloc)(void *ptr, size_t size);
 typedef void (*PlatformFree)(void *ptr);
 typedef void (*PlatformOnWindowResize)(struct Platform *, uint32_t w, uint32_t h);
 typedef bool (*PlatformOnLoad)(struct Platform *);
+typedef void (*PlatformOnQuit)(struct Platform *);
 typedef void (*PlatformFixedUpdate)(struct Platform *, float dt);
 typedef void (*PlatformUpdateAndRender)(struct Platform *, float dt, float alpha);
 typedef void (*PlatformLog)(const char *fmt, ...);
@@ -842,6 +846,7 @@ struct Platform {
 
 	Timestep Time;
 	PlatformOnLoad OnLoad;
+	PlatformOnQuit OnQuit;
 	PlatformFixedUpdate FixedUpdate;
 	PlatformUpdateAndRender UpdateAndRender;
 	PlatformOnWindowResize OnWindowResize;
@@ -853,11 +858,14 @@ struct Platform {
 inline void PlatformQuit(Platform *p) { p->Running = false; }
 
 inline bool KeyIsDown(Platform *p, Key k) { return p->Keyboard.IsDown[k]; }
-inline bool KeyIsPressed(Platform *p, Key k) { return p->Keyboard.IsDown[k] && !p->Keyboard.Repeat[k]; }
-inline bool KeyIsReleased(Platform *p, Key k) { return !p->Keyboard.IsDown[k] && p->Keyboard.WasDown[k]; }
+inline bool KeyIsPressed(Platform *p, Key k) { return p->Keyboard.EndedDown[k]; }
+inline bool KeyIsReleased(Platform *p, Key k) { return !p->Keyboard.EndedUp[k]; }
 inline bool ButtonIsDown(Platform *p, Button b) { return p->Mouse.IsDown[b]; }
-inline bool ButtonIsPressed(Platform *p, Button b) { return p->Mouse.IsDown[b] && !p->Mouse.WasDown[b]; }
-inline bool ButtonIsReleased(Platform *p, Button b) { return p->Mouse.WasDown[b] && !p->Mouse.IsDown[b]; }
+inline bool ButtonIsPressed(Platform *p, Button b) { return p->Mouse.EndedDown[b]; }
+inline bool ButtonIsReleased(Platform *p, Button b) { return p->Mouse.EndedUp[b]; }
 
+#if !defined(CppGameCall)
 #define CppGameCall extern "C"
+#endif
+
 CppGameCall void CppGameInitialize(Platform * platform, int argc, char **argv);

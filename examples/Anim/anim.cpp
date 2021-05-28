@@ -1,6 +1,8 @@
 #include "CppGame.h"
 #include <stdlib.h>
 
+namespace CppAnim {
+
 struct CurveEquation {
 	virtual float F(float x) = 0;
 };
@@ -74,11 +76,11 @@ void FixedUpdate(Platform *p, float dt) {
 }
 
 void UpdateAndRender(Platform *p, float dt, float alpha) {
-	if (KeyIsPressed(p, KeyEscape)) {
+	if (KeyIsPressed(p, Key_Escape)) {
 		PlatformQuit(p);
-	} 
-	
-	if (KeyIsPressed(p, KeySpace)) {
+	}
+
+	if (KeyIsPressed(p, Key_Space)) {
 		ReverseAnimation(&g_Animation);
 	}
 
@@ -97,11 +99,7 @@ void UpdateAndRender(Platform *p, float dt, float alpha) {
 	EndScene2D();
 }
 
-CppGameCall void CppGameInitialize(Platform *platform, int argc, char **argv) {
-	platform->Name = "Anim";
-	platform->FixedUpdate = FixedUpdate;
-	platform->UpdateAndRender = UpdateAndRender;
-
+bool OnLoad(Platform *p) {
 	g_Animation.Time = 0;
 	g_Animation.Factor = 0.4f;
 	g_Animation.Delta = 0.1f;
@@ -112,4 +110,19 @@ CppGameCall void CppGameInitialize(Platform *platform, int argc, char **argv) {
 	g_Bezier2.Strength = 0.07f;
 	g_SinWave.Amplitude = 50;
 	g_SinWave.Frequency = 0.1f;
+
+	return true;
 }
+
+}
+
+#if !defined(CPP_EXAMPLE_MENU)
+
+CppGameCall void CppGameInitialize(Platform *platform, int argc, char **argv) {
+	platform->Name = "Anim";
+	platform->OnLoad = CppAnim::OnLoad;
+	platform->FixedUpdate = CppAnim::FixedUpdate;
+	platform->UpdateAndRender = CppAnim::UpdateAndRender;
+}
+
+#endif

@@ -2272,6 +2272,10 @@ bool PlatformOnLoadStub(Platform *) {
 	return true;
 }
 
+void PlatformOnQuitStub(Platform *) {
+
+}
+
 void PlatformFixedUpdateStub(Platform *, float dt) {
 
 }
@@ -3622,93 +3626,93 @@ void LoadOpenGL(HWND window_handle) {
 }
 
 void WindowsMapKeys() {
-	g_WindowsKeyMap[(uint32_t)'A'] = KeyA;
-	g_WindowsKeyMap[(uint32_t)'B'] = KeyB;
-	g_WindowsKeyMap[(uint32_t)'C'] = KeyC;
-	g_WindowsKeyMap[(uint32_t)'D'] = KeyD;
-	g_WindowsKeyMap[(uint32_t)'E'] = KeyE;
-	g_WindowsKeyMap[(uint32_t)'F'] = KeyF;
-	g_WindowsKeyMap[(uint32_t)'G'] = KeyG;
-	g_WindowsKeyMap[(uint32_t)'H'] = KeyH;
-	g_WindowsKeyMap[(uint32_t)'I'] = KeyI;
-	g_WindowsKeyMap[(uint32_t)'J'] = KeyJ;
-	g_WindowsKeyMap[(uint32_t)'K'] = KeyK;
-	g_WindowsKeyMap[(uint32_t)'L'] = KeyL;
-	g_WindowsKeyMap[(uint32_t)'M'] = KeyM;
-	g_WindowsKeyMap[(uint32_t)'N'] = KeyN;
-	g_WindowsKeyMap[(uint32_t)'O'] = KeyO;
-	g_WindowsKeyMap[(uint32_t)'P'] = KeyP;
-	g_WindowsKeyMap[(uint32_t)'Q'] = KeyQ;
-	g_WindowsKeyMap[(uint32_t)'R'] = KeyR;
-	g_WindowsKeyMap[(uint32_t)'S'] = KeyS;
-	g_WindowsKeyMap[(uint32_t)'T'] = KeyT;
-	g_WindowsKeyMap[(uint32_t)'U'] = KeyU;
-	g_WindowsKeyMap[(uint32_t)'V'] = KeyV;
-	g_WindowsKeyMap[(uint32_t)'W'] = KeyW;
-	g_WindowsKeyMap[(uint32_t)'X'] = KeyX;
-	g_WindowsKeyMap[(uint32_t)'Y'] = KeyY;
-	g_WindowsKeyMap[(uint32_t)'Z'] = KeyZ;
+	g_WindowsKeyMap[(uint32_t)'A'] = Key_A;
+	g_WindowsKeyMap[(uint32_t)'B'] = Key_B;
+	g_WindowsKeyMap[(uint32_t)'C'] = Key_C;
+	g_WindowsKeyMap[(uint32_t)'D'] = Key_D;
+	g_WindowsKeyMap[(uint32_t)'E'] = Key_E;
+	g_WindowsKeyMap[(uint32_t)'F'] = Key_F;
+	g_WindowsKeyMap[(uint32_t)'G'] = Key_G;
+	g_WindowsKeyMap[(uint32_t)'H'] = Key_H;
+	g_WindowsKeyMap[(uint32_t)'I'] = Key_I;
+	g_WindowsKeyMap[(uint32_t)'J'] = Key_J;
+	g_WindowsKeyMap[(uint32_t)'K'] = Key_K;
+	g_WindowsKeyMap[(uint32_t)'L'] = Key_L;
+	g_WindowsKeyMap[(uint32_t)'M'] = Key_M;
+	g_WindowsKeyMap[(uint32_t)'N'] = Key_N;
+	g_WindowsKeyMap[(uint32_t)'O'] = Key_O;
+	g_WindowsKeyMap[(uint32_t)'P'] = Key_P;
+	g_WindowsKeyMap[(uint32_t)'Q'] = Key_Q;
+	g_WindowsKeyMap[(uint32_t)'R'] = Key_R;
+	g_WindowsKeyMap[(uint32_t)'S'] = Key_S;
+	g_WindowsKeyMap[(uint32_t)'T'] = Key_T;
+	g_WindowsKeyMap[(uint32_t)'U'] = Key_U;
+	g_WindowsKeyMap[(uint32_t)'V'] = Key_V;
+	g_WindowsKeyMap[(uint32_t)'W'] = Key_W;
+	g_WindowsKeyMap[(uint32_t)'X'] = Key_X;
+	g_WindowsKeyMap[(uint32_t)'Y'] = Key_Y;
+	g_WindowsKeyMap[(uint32_t)'Z'] = Key_Z;
 
-	g_WindowsKeyMap[(uint32_t)'0'] = Key0;
-	g_WindowsKeyMap[(uint32_t)'1'] = Key1;
-	g_WindowsKeyMap[(uint32_t)'2'] = Key2;
-	g_WindowsKeyMap[(uint32_t)'3'] = Key3;
-	g_WindowsKeyMap[(uint32_t)'4'] = Key4;
-	g_WindowsKeyMap[(uint32_t)'5'] = Key5;
-	g_WindowsKeyMap[(uint32_t)'6'] = Key6;
-	g_WindowsKeyMap[(uint32_t)'7'] = Key7;
-	g_WindowsKeyMap[(uint32_t)'8'] = Key8;
-	g_WindowsKeyMap[(uint32_t)'9'] = Key9;
+	g_WindowsKeyMap[(uint32_t)'0'] = Key_0;
+	g_WindowsKeyMap[(uint32_t)'1'] = Key_1;
+	g_WindowsKeyMap[(uint32_t)'2'] = Key_2;
+	g_WindowsKeyMap[(uint32_t)'3'] = Key_3;
+	g_WindowsKeyMap[(uint32_t)'4'] = Key_4;
+	g_WindowsKeyMap[(uint32_t)'5'] = Key_5;
+	g_WindowsKeyMap[(uint32_t)'6'] = Key_6;
+	g_WindowsKeyMap[(uint32_t)'7'] = Key_7;
+	g_WindowsKeyMap[(uint32_t)'8'] = Key_8;
+	g_WindowsKeyMap[(uint32_t)'9'] = Key_9;
 
-	g_WindowsKeyMap[VK_RETURN] = KeyReturn;
-	g_WindowsKeyMap[VK_ESCAPE] = KeyEscape;
-	g_WindowsKeyMap[VK_BACK] = KeyBackSpace;
-	g_WindowsKeyMap[VK_TAB] = KeyTab;
-	g_WindowsKeyMap[VK_SPACE] = KeySpace;
-	g_WindowsKeyMap[VK_SHIFT] = KeyShift;
-	g_WindowsKeyMap[VK_CONTROL] = KeyCtrl;
+	g_WindowsKeyMap[VK_RETURN] = Key_Return;
+	g_WindowsKeyMap[VK_ESCAPE] = Key_Escape;
+	g_WindowsKeyMap[VK_BACK] = Key_BackSpace;
+	g_WindowsKeyMap[VK_TAB] = Key_Tab;
+	g_WindowsKeyMap[VK_SPACE] = Key_Space;
+	g_WindowsKeyMap[VK_SHIFT] = Key_Shift;
+	g_WindowsKeyMap[VK_CONTROL] = Key_Ctrl;
 
-	g_WindowsKeyMap[VK_F1] = KeyF1;
-	g_WindowsKeyMap[VK_F2] = KeyF2;
-	g_WindowsKeyMap[VK_F3] = KeyF3;
-	g_WindowsKeyMap[VK_F4] = KeyF4;
-	g_WindowsKeyMap[VK_F5] = KeyF5;
-	g_WindowsKeyMap[VK_F6] = KeyF6;
-	g_WindowsKeyMap[VK_F7] = KeyF7;
-	g_WindowsKeyMap[VK_F8] = KeyF8;
-	g_WindowsKeyMap[VK_F9] = KeyF9;
-	g_WindowsKeyMap[VK_F10] = KeyF10;
-	g_WindowsKeyMap[VK_F11] = KeyF11;
-	g_WindowsKeyMap[VK_F12] = KeyF12;
+	g_WindowsKeyMap[VK_F1] = Key_F1;
+	g_WindowsKeyMap[VK_F2] = Key_F2;
+	g_WindowsKeyMap[VK_F3] = Key_F3;
+	g_WindowsKeyMap[VK_F4] = Key_F4;
+	g_WindowsKeyMap[VK_F5] = Key_F5;
+	g_WindowsKeyMap[VK_F6] = Key_F6;
+	g_WindowsKeyMap[VK_F7] = Key_F7;
+	g_WindowsKeyMap[VK_F8] = Key_F8;
+	g_WindowsKeyMap[VK_F9] = Key_F9;
+	g_WindowsKeyMap[VK_F10] = Key_F10;
+	g_WindowsKeyMap[VK_F11] = Key_F11;
+	g_WindowsKeyMap[VK_F12] = Key_F12;
 
-	g_WindowsKeyMap[VK_SNAPSHOT] = KeyPrintScreen;
-	g_WindowsKeyMap[VK_INSERT] = KeyInsert;
-	g_WindowsKeyMap[VK_HOME] = KeyHome;
-	g_WindowsKeyMap[VK_PRIOR] = KeyPageUp;
-	g_WindowsKeyMap[VK_NEXT] = KeyPageDown;
-	g_WindowsKeyMap[VK_DELETE] = KeyDelete;
-	g_WindowsKeyMap[VK_END] = KeyEnd;
-	g_WindowsKeyMap[VK_RIGHT] = KeyRight;
-	g_WindowsKeyMap[VK_LEFT] = KeyLeft;
-	g_WindowsKeyMap[VK_DOWN] = KeyDown;
-	g_WindowsKeyMap[VK_UP] = KeyUp;
-	g_WindowsKeyMap[VK_DIVIDE] = KeyDivide;
-	g_WindowsKeyMap[VK_MULTIPLY] = KeyMultiply;
-	g_WindowsKeyMap[VK_ADD] = KeyPlus;
-	g_WindowsKeyMap[VK_SUBTRACT] = KeyMinus;
-	g_WindowsKeyMap[VK_DECIMAL] = KeyPeriod;
-	g_WindowsKeyMap[VK_OEM_3] = KeyBackTick;
+	g_WindowsKeyMap[VK_SNAPSHOT] = Key_PrintScreen;
+	g_WindowsKeyMap[VK_INSERT] = Key_Insert;
+	g_WindowsKeyMap[VK_HOME] = Key_Home;
+	g_WindowsKeyMap[VK_PRIOR] = Key_PageUp;
+	g_WindowsKeyMap[VK_NEXT] = Key_PageDown;
+	g_WindowsKeyMap[VK_DELETE] = Key_Delete;
+	g_WindowsKeyMap[VK_END] = Key_End;
+	g_WindowsKeyMap[VK_RIGHT] = Key_Right;
+	g_WindowsKeyMap[VK_LEFT] = Key_Left;
+	g_WindowsKeyMap[VK_DOWN] = Key_Down;
+	g_WindowsKeyMap[VK_UP] = Key_Up;
+	g_WindowsKeyMap[VK_DIVIDE] = Key_Divide;
+	g_WindowsKeyMap[VK_MULTIPLY] = Key_Multiply;
+	g_WindowsKeyMap[VK_ADD] = Key_Plus;
+	g_WindowsKeyMap[VK_SUBTRACT] = Key_Minus;
+	g_WindowsKeyMap[VK_DECIMAL] = Key_Period;
+	g_WindowsKeyMap[VK_OEM_3] = Key_BackTick;
 
-	g_WindowsKeyMap[VK_NUMPAD0] = KeyPad0;
-	g_WindowsKeyMap[VK_NUMPAD1] = KeyPad1;
-	g_WindowsKeyMap[VK_NUMPAD2] = KeyPad2;
-	g_WindowsKeyMap[VK_NUMPAD3] = KeyPad3;
-	g_WindowsKeyMap[VK_NUMPAD4] = KeyPad4;
-	g_WindowsKeyMap[VK_NUMPAD5] = KeyPad5;
-	g_WindowsKeyMap[VK_NUMPAD6] = KeyPad6;
-	g_WindowsKeyMap[VK_NUMPAD7] = KeyPad7;
-	g_WindowsKeyMap[VK_NUMPAD8] = KeyPad8;
-	g_WindowsKeyMap[VK_NUMPAD9] = KeyPad9;
+	g_WindowsKeyMap[VK_NUMPAD0] = Key_Pad0;
+	g_WindowsKeyMap[VK_NUMPAD1] = Key_Pad1;
+	g_WindowsKeyMap[VK_NUMPAD2] = Key_Pad2;
+	g_WindowsKeyMap[VK_NUMPAD3] = Key_Pad3;
+	g_WindowsKeyMap[VK_NUMPAD4] = Key_Pad4;
+	g_WindowsKeyMap[VK_NUMPAD5] = Key_Pad5;
+	g_WindowsKeyMap[VK_NUMPAD6] = Key_Pad6;
+	g_WindowsKeyMap[VK_NUMPAD7] = Key_Pad7;
+	g_WindowsKeyMap[VK_NUMPAD8] = Key_Pad8;
+	g_WindowsKeyMap[VK_NUMPAD9] = Key_Pad9;
 }
 
 void ToggleFullscreen(HWND hwnd) {
@@ -3817,50 +3821,56 @@ LRESULT CALLBACK WindowProcedure(HWND wnd, UINT msg, WPARAM wparam,
 
 		case WM_LBUTTONDOWN:
 		{
-			g_Platform.Mouse.IsDown[ButtonLeft] = true;
+			g_Platform.Mouse.IsDown[Button_Left] = true;
+			g_Platform.Mouse.EndedDown[Button_Left] = true;
 		} break;
 
 		case WM_MBUTTONDOWN:
 		{
-			g_Platform.Mouse.IsDown[ButtonMiddle] = true;
+			g_Platform.Mouse.IsDown[Button_Middle] = true;
+			g_Platform.Mouse.EndedDown[Button_Middle] = true;
 		} break;
 
 		case WM_RBUTTONDOWN:
 		{
-			g_Platform.Mouse.IsDown[ButtonRight] = true;
+			g_Platform.Mouse.IsDown[Button_Right] = true;
+			g_Platform.Mouse.EndedDown[Button_Right] = true;
 		} break;
 
 		case WM_LBUTTONUP:
 		{
-			g_Platform.Mouse.IsDown[ButtonLeft] = false;
-			g_Platform.Mouse.Transitions[ButtonLeft] += 1;
+			g_Platform.Mouse.IsDown[Button_Left] = false;
+			g_Platform.Mouse.EndedUp[Button_Left] = true;
+			g_Platform.Mouse.Transitions[Button_Left] += 1;
 		} break;
 
 		case WM_MBUTTONUP:
 		{
-			g_Platform.Mouse.IsDown[ButtonMiddle] = false;
-			g_Platform.Mouse.Transitions[ButtonMiddle] += 1;
+			g_Platform.Mouse.IsDown[Button_Middle] = false;
+			g_Platform.Mouse.EndedUp[Button_Middle] = true;
+			g_Platform.Mouse.Transitions[Button_Middle] += 1;
 		} break;
 
 		case WM_RBUTTONUP:
 		{
-			g_Platform.Mouse.IsDown[ButtonRight] = false;
-			g_Platform.Mouse.Transitions[ButtonRight] += 1;
+			g_Platform.Mouse.IsDown[Button_Right] = false;
+			g_Platform.Mouse.EndedUp[Button_Right] = true;
+			g_Platform.Mouse.Transitions[Button_Right] += 1;
 		} break;
 
 		case WM_LBUTTONDBLCLK:
 		{
-			g_Platform.Mouse.DoubleClick[ButtonLeft] += 1;
+			g_Platform.Mouse.DoubleClick[Button_Left] += 1;
 		} break;
 
 		case WM_MBUTTONDBLCLK:
 		{
-			g_Platform.Mouse.DoubleClick[ButtonMiddle] += 1;
+			g_Platform.Mouse.DoubleClick[Button_Middle] += 1;
 		} break;
 
 		case WM_RBUTTONDBLCLK:
 		{
-			g_Platform.Mouse.DoubleClick[ButtonRight] += 1;
+			g_Platform.Mouse.DoubleClick[Button_Right] += 1;
 		} break;
 
 		case WM_KEYDOWN:
@@ -3871,14 +3881,34 @@ LRESULT CALLBACK WindowProcedure(HWND wnd, UINT msg, WPARAM wparam,
 
 			uint32_t key = g_WindowsKeyMap[wparam];
 			g_Platform.Keyboard.IsDown[key] = true;
-			g_Platform.Keyboard.Repeat[key] = ((lparam & (1 << 30)) == (1 << 30));
+			g_Platform.Keyboard.EndedDown[key] = true;
+ 			g_Platform.Keyboard.Repeat[key] = ((lparam & (1 << 30)) == (1 << 30));
 		} break;
 
 		case WM_KEYUP:
 		{
 			uint32_t key = g_WindowsKeyMap[wparam];
 			g_Platform.Keyboard.IsDown[key] = false;
+			g_Platform.Keyboard.EndedUp[key] = true;
 			g_Platform.Keyboard.Transitions[key] += 1;
+		} break;
+
+		case WM_SYSKEYDOWN:
+		{
+			if (wparam == VK_F10) {
+				auto key = Key_F10;
+				g_Platform.Keyboard.IsDown[key] = true;
+				g_Platform.Keyboard.Repeat[key] = ((lparam & (1 << 30)) == (1 << 30));
+			}
+		} break;
+
+		case WM_SYSKEYUP:
+		{
+			if (wparam == VK_F10) {
+				auto key = Key_F10;
+				g_Platform.Keyboard.IsDown[key] = false;
+				g_Platform.Keyboard.Transitions[key] += 1;
+			}
 		} break;
 
 		case WM_MOUSEWHEEL:
@@ -3958,6 +3988,7 @@ int main(int argc, char **argv) {
 	g_Platform.Time.SimulationSpeedFactor = 1;
 
 	g_Platform.OnLoad = PlatformOnLoadStub;
+	g_Platform.OnQuit = PlatformOnQuitStub;
 	g_Platform.FixedUpdate = PlatformFixedUpdateStub;
 	g_Platform.UpdateAndRender = PlatformUpdateAndRenderStub;
 	g_Platform.OnWindowResize = PlatformOnWindowResizeStub;
@@ -3969,6 +4000,7 @@ int main(int argc, char **argv) {
 	if (g_Platform.Running == false) return 0;
 
 	if (!g_Platform.OnLoad) g_Platform.OnLoad = PlatformOnLoadStub;
+	if (!g_Platform.OnQuit) g_Platform.OnQuit = PlatformOnQuitStub;
 	if (!g_Platform.FixedUpdate) g_Platform.FixedUpdate = PlatformFixedUpdateStub;
 	if (!g_Platform.UpdateAndRender) g_Platform.UpdateAndRender = PlatformUpdateAndRenderStub;
 	if (!g_Platform.OnWindowResize) g_Platform.OnWindowResize = PlatformOnWindowResizeStub;
@@ -4044,11 +4076,14 @@ int main(int argc, char **argv) {
 	QueryPerformanceCounter(&counter);
 
 	while (g_Platform.Running) {
-		memcpy(g_Platform.Keyboard.WasDown, g_Platform.Keyboard.IsDown, sizeof(g_Platform.Keyboard.IsDown));
-		memcpy(g_Platform.Mouse.WasDown, g_Platform.Mouse.IsDown, sizeof(g_Platform.Mouse.IsDown));
+		memset(g_Platform.Keyboard.EndedDown, 0, sizeof(g_Platform.Keyboard.EndedDown));
+		memset(g_Platform.Keyboard.EndedUp, 0, sizeof(g_Platform.Keyboard.EndedUp));
 		memset(g_Platform.Keyboard.Transitions, 0, sizeof(g_Platform.Keyboard.Transitions));
+		memset(g_Platform.Mouse.EndedDown, 0, sizeof(g_Platform.Mouse.EndedDown));
+		memset(g_Platform.Mouse.EndedUp, 0, sizeof(g_Platform.Mouse.EndedUp));
 		memset(g_Platform.Mouse.Transitions, 0, sizeof(g_Platform.Mouse.Transitions));
 		memset(g_Platform.Mouse.DoubleClick, 0, sizeof(g_Platform.Mouse.DoubleClick));
+		g_Platform.Mouse.Delta = Vec2(0);
 		g_Platform.Mouse.Scroll = Vec2(0);
 
 		MSG msg;
@@ -4100,6 +4135,8 @@ int main(int argc, char **argv) {
 		accumulator += g_Platform.Time.DeltaTime;
 		accumulator = Minimum(accumulator, 0.2f);
 	}
+
+	g_Platform.OnQuit(&g_Platform);
 
 	return 0;
 }
