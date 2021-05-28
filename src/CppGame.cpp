@@ -3904,11 +3904,15 @@ void DestroyTexture(uint32_t tex) {
 	glDeleteTextures(1, &tex);
 }
 
-uint32_t CreateTextureFromFile(Platform *platform, const char *file) {
-	uint32_t w, h, channels, bit_depth;
-	uint8_t *pixels = LoadPNGFile(platform, file, &w, &h, &channels, &bit_depth);
+uint32_t CreateTextureFromFile(Platform *platform, const char *file, uint32_t *w, uint32_t *h, uint32_t *channels) {
+	uint32_t bit_depth;
+	uint8_t *pixels = LoadPNGFile(platform, file, w, h, channels, &bit_depth);
+	if (bit_depth != 8) {
+		platform->Free(pixels);
+		return 0;
+	}
 
-	uint32_t t = CreateTexture(pixels, w, h, channels);
+	uint32_t t = CreateTexture(pixels, *w, *h, *channels);
 	platform->Free(pixels);
 	return t;
 }
@@ -4427,6 +4431,10 @@ LRESULT CALLBACK WindowProcedure(HWND wnd, UINT msg, WPARAM wparam,
 		{
 			uint32_t x = (uint32_t)LOWORD(lparam);
 			uint32_t y = (uint32_t)HIWORD(lparam);
+
+			g_Platform.RenderTargetWidth = (float)x;
+			g_Platform.RenderTargetHeight = (float)y;
+
 			g_Platform.OnWindowResize(&g_Platform, x, y);
 			result = DefWindowProcW(wnd, msg, wparam, lparam);
 		} break;
@@ -4622,6 +4630,13 @@ void WindowsLog(const char *fmt, ...) {
 	va_end(ap);
 }
 
+void WindowsLogError(const char *fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+	vfprintf(stderr, fmt, ap);
+	va_end(ap);
+}
+
 void WindowsFatalError(const char *msg) {
 	FatalAppExitA(0, msg);
 }
@@ -4648,6 +4663,7 @@ int main(int argc, char **argv) {
 	g_Platform.Free = WindowsFree;
 	g_Platform.UserPointer = nullptr;
 	g_Platform.Log = WindowsLog;
+	g_Platform.LogError = WindowsLogError;
 	g_Platform.FatalError = WindowsFatalError;
 	g_Platform.RenderTargetWidth = 800;
 	g_Platform.RenderTargetHeight = 600;
@@ -4768,10 +4784,6 @@ int main(int argc, char **argv) {
 			DispatchMessageW(&msg);
 		}
 
-		RECT rect;
-		GetClientRect(window, &rect);
-		g_Platform.RenderTargetWidth = (float)(rect.right - rect.left);
-		g_Platform.RenderTargetHeight = (float)(rect.bottom - rect.top);
 		g_Platform.AspectRatio = g_Platform.RenderTargetWidth / g_Platform.RenderTargetHeight;
 
 		while (accumulator >= dt) {

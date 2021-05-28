@@ -758,7 +758,7 @@ void DrawPolygonOutline(const Vec2 *vertices, uint32_t count, Vec4 color);
 uint8_t* LoadPNGFile(struct Platform* p, const char* img_path, unsigned* width, unsigned* height, unsigned* no_of_channels, unsigned* bit_depth);
 
 uint32_t CreateTexture(uint8_t *pixels, uint32_t width, uint32_t height, uint32_t channels);
-uint32_t CreateTextureFromFile(struct Platform *platform, const char *file);
+uint32_t CreateTextureFromFile(Platform *platform, const char *file, uint32_t *w, uint32_t *h, uint32_t *channels);
 void DestroyTexture(uint32_t tex);
 
 //
@@ -825,6 +825,7 @@ typedef void (*PlatformOnQuit)(struct Platform *);
 typedef void (*PlatformFixedUpdate)(struct Platform *, float dt);
 typedef void (*PlatformUpdateAndRender)(struct Platform *, float dt, float alpha);
 typedef void (*PlatformLog)(const char *fmt, ...);
+typedef void (*PlatformLogError)(const char *fmt, ...);
 typedef void (*PlatformFatalError)(const char *messge);
 
 struct Platform {
@@ -839,6 +840,7 @@ struct Platform {
 	MouseState Mouse;
 
 	PlatformLog Log;
+	PlatformLogError LogError;
 	PlatformFatalError FatalError;
 	
 	float RenderTargetWidth;
