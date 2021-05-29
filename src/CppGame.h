@@ -676,6 +676,37 @@ void *operator new(size_t size, Arena *arena) noexcept;
 //
 //
 
+struct CodepointRange {
+	uint32_t *Buffer;  // NOTE: Must be arranged ascending order
+	uint32_t  First;
+	uint32_t  Count;
+};
+
+struct GlyphInfo {
+	Rect  TexCoord;
+	Vec2  Bearing;
+	float Advance;
+	Vec2  Dimension;
+};
+
+struct GlyphRange {
+	CodepointRange Codepoint;
+	GlyphInfo *Info;
+};
+
+struct Font {
+	float		Size;
+	float		Ascender;
+	float		Descender;
+	uint32_t	Texture;
+	GlyphRange *Range;
+	uint32_t    RangeCount;
+};
+
+//
+//
+//
+
 static constexpr int DEFAULT_CIRCLE_SEGMENTS = 48;
 static constexpr int DEFAULT_BEZIER_SEGMENTS = 48;
 
@@ -754,6 +785,14 @@ void DrawArcOutline(Vec2 position, float radius_a, float radius_b, float theta_a
 void DrawArcOutline(Vec2 position, float radius, float theta_a, float theta_b, Vec4 color, bool closed = true, int segments = DEFAULT_CIRCLE_SEGMENTS);
 
 void DrawPolygonOutline(const Vec2 *vertices, uint32_t count, Vec4 color);
+
+float GetFontScale(float size = 1);
+float CalculateMaxHeight(String text, float size = 1);
+float CalculateMaxHeight(String text, float size, Font *font);
+float CalculateText(String text, float size, Font *font);
+float CalculateText(String text, float size = 1);
+void DrawText(String text, Vec2 position, Vec4 color, float size, Font *font);
+void DrawText(String text, Vec2 position, Vec4 color, float size = 1);
 
 uint8_t* LoadPNGFile(struct Platform* p, const char* img_path, unsigned* width, unsigned* height, unsigned* no_of_channels, unsigned* bit_depth);
 

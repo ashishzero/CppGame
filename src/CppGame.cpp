@@ -2157,6 +2157,99 @@ void DrawPolygonOutline(const Vec2 *vertices, uint32_t count, Vec4 color) {
 	DrawLine(*vertices, *p, color);
 }
 
+const GlyphInfo *const FindGlyphInfo(Font *font, uint32_t codepoint) {
+	GlyphRange *range = font->Range;
+	for (uint32_t index = 0; index < font->RangeCount; ++index, ++range) {
+		if (range->Codepoint.Buffer) {
+			uint32_t first_codepoint = range->Codepoint.Buffer[0];
+			uint32_t last_codepoint = range->Codepoint.Buffer[range->Codepoint.Count - 1];
+
+			if (codepoint > first_codepoint && codepoint < last_codepoint) {
+				uint32_t search_index = range->Codepoint.Count / 2;
+
+				while (true) {
+					uint32_t prev_search_index = search_index;
+					uint32_t found_codepoint = range->Codepoint.Buffer[search_index];
+					if (found_codepoint == codepoint) {
+						return &range->Info[search_index];
+					} else if (codepoint < found_codepoint) {
+						search_index /= 2;
+					} else {
+						search_index += (search_index / 2);
+					}
+					if (prev_search_index == search_index) break;
+				}
+			}
+		} else {
+			if (codepoint >= range->Codepoint.First && codepoint < range->Codepoint.First + range->Codepoint.Count) {
+				return &range->Info[codepoint - range->Codepoint.First];
+			}
+		}
+	}
+	return nullptr;
+}
+
+float CalculateMaxHeight(String text, float size, Font *font) {
+	float p = 0;
+
+	int64_t  index = 0;
+	while (index < text.Length) {
+		uint32_t codepoint = text.Data[index];
+
+		auto info = FindGlyphInfo(font, codepoint);
+		if (info) {
+			p = Maximum(p, size * info->Advance);
+		} else {
+			p = Maximum(p, size * (float)font->Size);
+		}
+		index += 1;
+	}
+
+	return p;
+}
+
+float CalculateText(String text, float size, Font *font) {
+	float p = 0;
+
+	int64_t  index = 0;
+	while (index < text.Length) {
+		uint32_t codepoint = text.Data[index];
+
+		auto info = FindGlyphInfo(font, codepoint);
+		if (info) {
+			p += size * info->Advance;
+		} else {
+			p += size * (float)font->Size;
+		}
+		index += 1;
+	}
+
+	return p;
+}
+
+void DrawText(String text, Vec2 position, Vec4 color, float size, Font *font) {
+	uint32_t texture_ref = PushTexture(font->Texture);
+	Defer{ PopTexture(texture_ref); };
+
+	position.y += size * (float)(font->Ascender + font->Descender);
+
+	int64_t  index = 0;
+	while (index < text.Length) {
+		uint32_t codepoint = text.Data[index];
+
+		auto info = FindGlyphInfo(font, codepoint);
+		if (info) {
+			DrawRect(position + size * info->Bearing, size * info->Dimension, info->TexCoord, color);
+			position.x += size * info->Advance;
+		} else {
+			DrawRect(position, Vec2(size * (float)font->Size), Rect(0, 0, 0, 0), color);
+			position.x += size * (float)font->Size;
+		}
+
+		index += 1;
+	}
+}
+
 //
 // End Renderer
 //
