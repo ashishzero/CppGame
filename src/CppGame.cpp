@@ -2396,7 +2396,8 @@ static void reverse_filter(Platform* p, const uint8_t* data, uint32_t len, pngIn
 }
 
 
-#define MAX_SIZE (10 * 1024 * 1024)
+#define MAX_SIZE (10 * 1024 * 1024) // Specify it to limit the max size of image that can be loaded
+
 uint8_t* LoadPNGFile(Platform* p, const char* img_path, uint32_t* width, uint32_t* height, uint32_t* no_of_channels, uint32_t* bit_depth)
 {
 	FILE* image_file = NULL;
@@ -2413,16 +2414,8 @@ uint8_t* LoadPNGFile(Platform* p, const char* img_path, uint32_t* width, uint32_
 		return NULL;
 	}
 #endif 
-
-	const struct handler handlers[] = {
-		{"bKGD", background_handler},
-		{"pHYs", pixelXY_handler},
-		{"PLTE", palette_generator},
-		{NULL, NULL} };
-
-	// Allocate space and read from file
 	uint8_t* buf = (uint8_t*)p->Alloc(sizeof(uint8_t) * MAX_SIZE);
-	uint32_t size = (uint32_t) fread(buf, 1, MAX_SIZE, image_file);
+	uint32_t size = (uint32_t)fread(buf, 1, MAX_SIZE, image_file);
 	if (size == MAX_SIZE)
 	{
 		// Memory leak here
@@ -2430,6 +2423,22 @@ uint8_t* LoadPNGFile(Platform* p, const char* img_path, uint32_t* width, uint32_
 		p->Free(buf);
 		return NULL;
 	}
+	auto ans =LoadPNGFromMemory(p, buf, size,width, height, no_of_channels, bit_depth);
+	fprintf(stderr,"\nWidth and height are : %u and %u.", *width, *height);
+	p->Free(buf);
+	return ans;
+}
+
+uint8_t* LoadPNGFromMemory(Platform*p,uint8_t * buf,uint32_t sz,uint32_t* width, uint32_t* height, uint32_t* no_of_channels, uint32_t * bit_depth)
+{
+	const struct handler handlers[] = {
+		{"bKGD", background_handler},
+		{"pHYs", pixelXY_handler},
+		{"PLTE", palette_generator},
+		{NULL, NULL} };
+
+	// Allocate space and read from file
+
 	// Allocate buffer for deflate stream
 	// This stream is formed by concatenating chunk of IDAT in a sequential manner
 	uint8_t* deflate_stream = (uint8_t*)p->Alloc(sizeof(uint8_t) * MAX_SIZE);
@@ -2492,7 +2501,7 @@ uint8_t* LoadPNGFile(Platform* p, const char* img_path, uint32_t* width, uint32_
 	uint32_t decomp_len = MAX_SIZE;
 
 	//// It decompresses the deflate stream, writes it into decomp_data and writes total length of output stram in decomp_len integer
-	if (deflate(deflate_stream + 2, deflate_len, decomp_data, &decomp_len))
+	if (deflate(deflate_stream + 2, sz, decomp_data, &decomp_len))
 	{
 		fprintf(stderr, "Failed the deflate decompression..");
 		return NULL;
@@ -2514,8 +2523,7 @@ uint8_t* LoadPNGFile(Platform* p, const char* img_path, uint32_t* width, uint32_
 
 	// image_info have everything that is needed by other programs
 
-	fclose(image_file);
-	p->Free(buf);
+
 	p->Free(deflate_stream);
 	p->Free(decomp_data);
 

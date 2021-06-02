@@ -757,6 +757,11 @@ void DrawPolygonOutline(const Vec2 *vertices, uint32_t count, Vec4 color);
 
 uint8_t* LoadPNGFile(struct Platform* p, const char* img_path, unsigned* width, unsigned* height, unsigned* no_of_channels, unsigned* bit_depth);
 
+// decode png file from the supplied stream
+// Size allocated by this and above function will exactly be width * height * no_of_channels * (bit_depth/8) bytes
+uint8_t* LoadPNGFromMemory(Platform* p, uint8_t* raw_image_data, uint32_t total_len, uint32_t* width, uint32_t* height, uint32_t* no_of_channels, uint32_t* bit_depth);
+
+
 uint32_t CreateTexture(uint8_t *pixels, uint32_t width, uint32_t height, uint32_t channels);
 uint32_t CreateTextureFromFile(Platform *platform, const char *file, uint32_t *w, uint32_t *h, uint32_t *channels);
 void DestroyTexture(uint32_t tex);
