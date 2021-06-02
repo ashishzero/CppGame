@@ -2189,14 +2189,14 @@ typedef struct pngInfo
 static int deflate(uint8_t*, uint32_t, uint8_t*, uint32_t*);
 
 // helper functions defined here
-uint8_t average(uint8_t a, uint8_t b)
+static uint8_t average(uint8_t a, uint8_t b)
 {
 	uint16_t c = a + b;
 	return c / 2;
 }
 
 // uses upcoming 4 bytes to form it into 32 bit integer with network order
-uint32_t getBigEndian(const uint8_t* lenbuf)
+static uint32_t getBigEndian(const uint8_t* lenbuf)
 {
 	uint32_t v = 0, temp = 0;
 	uint8_t ch;
@@ -2212,7 +2212,7 @@ uint32_t getBigEndian(const uint8_t* lenbuf)
 }
 
 // png chunk handler.. doesn't do anything much but will be required
-void header_handler(uint8_t* buffer, int len, pngInfo* image_info)
+static void header_handler(uint8_t* buffer, int len, pngInfo* image_info)
 {
 	image_info->image_width = getBigEndian(buffer);
 	image_info->image_height = getBigEndian(buffer + 4);
@@ -2220,7 +2220,7 @@ void header_handler(uint8_t* buffer, int len, pngInfo* image_info)
 	image_info->color_type = buffer[9];
 }
 
-void background_handler(uint8_t* buffer, int len)
+static void background_handler(uint8_t* buffer, int len)
 {
 	printf("Background Color info :  \n");
 	int r = 0, g = 0, b = 0;
@@ -2235,14 +2235,14 @@ void background_handler(uint8_t* buffer, int len)
 	printf("\tBlue color is %02x.\n", b);
 }
 
-void pixelXY_handler(uint8_t* buffer, int len)
+static void pixelXY_handler(uint8_t* buffer, int len)
 {
 	printf("\tPixel per unit, X axis : %u.\n", getBigEndian(buffer));
 	printf("\tPixel per unit, Y axis : %u.\n", getBigEndian(buffer + 4));
 	printf("\tUnit specifier : %u.\n", (unsigned char)*(buffer + 8));
 }
 
-void palette_generator(uint8_t* buffer, int len)
+static void palette_generator(uint8_t* buffer, int len)
 {
 	for (int i = 0; i < len; i += 3)
 	{
@@ -2252,7 +2252,7 @@ void palette_generator(uint8_t* buffer, int len)
 
 
 // utility functions
-bool validate_header(const uint8_t* buf)
+static bool validate_header(const uint8_t* buf)
 {
 	// Validate first 4 bytes of the header.
 	return buf[0] == 0x89 && buf[1] == 'P' && buf[2] == 'N' && buf[3] == 'G';
@@ -2261,7 +2261,7 @@ bool validate_header(const uint8_t* buf)
 
 
 
-uint32_t CRC_check(uint8_t* buf, int len)
+static uint32_t CRC_check(uint8_t* buf, int len)
 {
 	const uint32_t POLY = 0xEDB88320; // Straight copied
 	const uint8_t* buffer = (const uint8_t*)buf;
@@ -2281,7 +2281,7 @@ uint32_t CRC_check(uint8_t* buf, int len)
 	return ~crc;
 }
 
-uint32_t adler32_checksum(const uint8_t* buffer, int len)
+static uint32_t adler32_checksum(const uint8_t* buffer, int len)
 {
 	const uint32_t adler_mod = 65521; // smallest prime less than 2^16-1
 	uint16_t a = 1;
@@ -2294,7 +2294,7 @@ uint32_t adler32_checksum(const uint8_t* buffer, int len)
 	return (b << 16) | a;
 }
 
-uint8_t paethPredictor(uint8_t a, uint8_t b, uint8_t c)
+static uint8_t paethPredictor(uint8_t a, uint8_t b, uint8_t c)
 {
 	int p = a + b - c;
 	int pa = abs(p - a);
@@ -2311,7 +2311,7 @@ uint8_t paethPredictor(uint8_t a, uint8_t b, uint8_t c)
 	return pr;
 }
 
-void reverse_filter(Platform* p, const uint8_t* data, uint32_t len, pngInfo* image_info)
+static void reverse_filter(Platform* p, const uint8_t* data, uint32_t len, pngInfo* image_info)
 {
 	// Demo for only color_type 6 i.e true color with alpha channel
 	if (!(image_info->color_type == 2 || image_info->color_type == 6))
@@ -2330,7 +2330,7 @@ void reverse_filter(Platform* p, const uint8_t* data, uint32_t len, pngInfo* ima
 		byteDepth = 4;
 
 	uint8_t* prev_scanline = (uint8_t*)p->Alloc(sizeof(uint8_t) * image_info->image_width * byteDepth);
-	for (unsigned int i = 0; i < image_info->image_width; ++i)
+	for (uint32_t i = 0; i < image_info->image_width; ++i)
 		prev_scanline[i] = 0;
 
 	uint8_t* final_data = (uint8_t*)p->Alloc(sizeof(char) * image_info->image_width * image_info->image_height * byteDepth);
@@ -2566,14 +2566,14 @@ struct huffman
 	short* symbol;
 };
 
-int codes(struct state* s, struct huffman*, struct huffman*);
+static int codes(struct state* s, struct huffman*, struct huffman*);
 // Used to create huffman table
-int construct(struct huffman*, short*, int);
+static int construct(struct huffman*, short*, int);
 
 // decode binary code using generated huffman table
-int decode(struct state*, struct huffman*);
+static int decode(struct state*, struct huffman*);
 
-int deflate(unsigned char* buffer, unsigned int inlen, unsigned char* out, unsigned* outlen)
+static int deflate(uint8_t* buffer, uint32_t inlen, uint8_t* out, uint32_t* outlen)
 {
 	struct state s;
 	s.input = buffer;
