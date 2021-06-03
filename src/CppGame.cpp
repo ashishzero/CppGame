@@ -2166,40 +2166,40 @@ void DrawPolygonOutline(const Vec2 *vertices, uint32_t count, Vec4 color) {
 //
 
 // Start of the PNG decoder
-typedef void (*handle_ptr)(unsigned char*, int);
+typedef void (*handlePtr)(unsigned char*, int);
 
 struct handler
 {
 	const char* type;
-	handle_ptr func;
+	handlePtr func;
 };
 
 typedef struct pngInfo
 {
-	unsigned char* image_data;
-	unsigned count;
-	unsigned image_width;
-	unsigned image_height;
+	uint8_t* image_data;
+	uint32_t count;
+	uint32_t image_width;
+	uint32_t image_height;
 	enum { RGB, RGBA } color_channel;
-	unsigned color_type;
-	unsigned image_bit_depth;
+	uint32_t color_type;
+	uint32_t image_bit_depth;
 } pngInfo;
 
 // Forward declaration
-static int deflate(unsigned char*, unsigned, unsigned char*, unsigned*);
+static int deflate(uint8_t*, uint32_t, uint8_t*, uint32_t*);
 
 // helper functions defined here
-unsigned char average(unsigned char a, unsigned char b)
+static uint8_t average(uint8_t a, uint8_t b)
 {
-	int c = a + b;
+	uint16_t c = a + b;
 	return c / 2;
 }
 
 // uses upcoming 4 bytes to form it into 32 bit integer with network order
-unsigned int getBigEndian(const unsigned char* lenbuf)
+static uint32_t getBigEndian(const uint8_t* lenbuf)
 {
-	unsigned int v = 0, temp = 0;
-	unsigned char ch;
+	uint32_t v = 0, temp = 0;
+	uint8_t ch;
 	int k = 24;
 	for (int i = 0; i < 4; ++i)
 	{
@@ -2212,7 +2212,7 @@ unsigned int getBigEndian(const unsigned char* lenbuf)
 }
 
 // png chunk handler.. doesn't do anything much but will be required
-void header_handler(unsigned char* buffer, int len, pngInfo* image_info)
+static void header_handler(uint8_t* buffer, int len, pngInfo* image_info)
 {
 	image_info->image_width = getBigEndian(buffer);
 	image_info->image_height = getBigEndian(buffer + 4);
@@ -2220,7 +2220,7 @@ void header_handler(unsigned char* buffer, int len, pngInfo* image_info)
 	image_info->color_type = buffer[9];
 }
 
-void background_handler(unsigned char* buffer, int len)
+static void background_handler(uint8_t* buffer, int len)
 {
 	printf("Background Color info :  \n");
 	int r = 0, g = 0, b = 0;
@@ -2235,24 +2235,24 @@ void background_handler(unsigned char* buffer, int len)
 	printf("\tBlue color is %02x.\n", b);
 }
 
-void pixelXY_handler(unsigned char* buffer, int len)
+static void pixelXY_handler(uint8_t* buffer, int len)
 {
 	printf("\tPixel per unit, X axis : %u.\n", getBigEndian(buffer));
 	printf("\tPixel per unit, Y axis : %u.\n", getBigEndian(buffer + 4));
 	printf("\tUnit specifier : %u.\n", (unsigned char)*(buffer + 8));
 }
 
-void palette_generator(unsigned char* buffer, int len)
+static void palette_generator(uint8_t* buffer, int len)
 {
 	for (int i = 0; i < len; i += 3)
 	{
-		printf("%02x %02x %02x   ", (unsigned char)buffer[i], (unsigned char)buffer[i + 1], (unsigned char)buffer[i + 2]);
+		printf("%02x %02x %02x   ", (uint8_t)buffer[i], (uint8_t)buffer[i + 1], (uint8_t)buffer[i + 2]);
 	}
 }
 
 
 // utility functions
-bool validate_header(const unsigned char* buf)
+static bool validate_header(const uint8_t* buf)
 {
 	// Validate first 4 bytes of the header.
 	return buf[0] == 0x89 && buf[1] == 'P' && buf[2] == 'N' && buf[3] == 'G';
@@ -2261,10 +2261,10 @@ bool validate_header(const unsigned char* buf)
 
 
 
-uint32_t CRC_check(unsigned char* buf, int len)
+static uint32_t CRC_check(uint8_t* buf, int len)
 {
 	const uint32_t POLY = 0xEDB88320; // Straight copied
-	const unsigned char* buffer = (const unsigned char*)buf;
+	const uint8_t* buffer = (const uint8_t*)buf;
 	uint32_t crc = -1;
 
 	while (len--)
@@ -2281,7 +2281,7 @@ uint32_t CRC_check(unsigned char* buf, int len)
 	return ~crc;
 }
 
-uint32_t adler32_checksum(const unsigned char* buffer, int len)
+static uint32_t adler32_checksum(const uint8_t* buffer, int len)
 {
 	const uint32_t adler_mod = 65521; // smallest prime less than 2^16-1
 	uint16_t a = 1;
@@ -2294,7 +2294,7 @@ uint32_t adler32_checksum(const unsigned char* buffer, int len)
 	return (b << 16) | a;
 }
 
-unsigned char paethPredictor(unsigned char a, unsigned char b, unsigned char c)
+static uint8_t paethPredictor(uint8_t a, uint8_t b, uint8_t c)
 {
 	int p = a + b - c;
 	int pa = abs(p - a);
@@ -2311,7 +2311,7 @@ unsigned char paethPredictor(unsigned char a, unsigned char b, unsigned char c)
 	return pr;
 }
 
-void reverse_filter(Platform* p, const unsigned char* data, unsigned len, pngInfo* image_info)
+static void reverse_filter(Platform* p, const uint8_t* data, uint32_t len, pngInfo* image_info)
 {
 	// Demo for only color_type 6 i.e true color with alpha channel
 	if (!(image_info->color_type == 2 || image_info->color_type == 6))
@@ -2329,23 +2329,23 @@ void reverse_filter(Platform* p, const unsigned char* data, unsigned len, pngInf
 	else
 		byteDepth = 4;
 
-	unsigned char* prev_scanline = (unsigned char*)p->Alloc(sizeof(unsigned char) * image_info->image_width * byteDepth);
-	for (unsigned int i = 0; i < image_info->image_width; ++i)
+	uint8_t* prev_scanline = (uint8_t*)p->Alloc(sizeof(uint8_t) * image_info->image_width * byteDepth);
+	for (uint32_t i = 0; i < image_info->image_width; ++i)
 		prev_scanline[i] = 0;
 
-	unsigned char* final_data = (unsigned char*)p->Alloc(sizeof(char) * image_info->image_width * image_info->image_height * byteDepth);
-	unsigned char* original_data = final_data;
+	uint8_t* final_data = (uint8_t*)p->Alloc(sizeof(char) * image_info->image_width * image_info->image_height * byteDepth);
+	uint8_t* original_data = final_data;
 
-	const unsigned char* filter_data = data;
+	const uint8_t* filter_data = data;
 
-	unsigned char a = 0, b = 0, c = 0, x;
+	uint8_t a = 0, b = 0, c = 0, x;
 	int pos = 0;
 	int line_byte = image_info->image_width * byteDepth;
-	unsigned char ch;
+	uint8_t ch;
 
 	int count = 0;
 
-	for (unsigned int height = 0; height < image_info->image_height; ++height)
+	for (uint32_t height = 0; height < image_info->image_height; ++height)
 	{
 		ch = *filter_data;
 		pos = 1;
@@ -2396,8 +2396,9 @@ void reverse_filter(Platform* p, const unsigned char* data, unsigned len, pngInf
 }
 
 
-#define MAX_SIZE (10 * 1024 * 1024)
-unsigned char* LoadPNGFile(Platform* p, const char* img_path, unsigned* width, unsigned* height, unsigned* no_of_channels, unsigned* bit_depth)
+#define MAX_SIZE (10 * 1024 * 1024) // Specify it to limit the max size of image that can be loaded
+
+uint8_t* LoadPNGFile(Platform* p, const char* img_path, uint32_t* width, uint32_t* height, uint32_t* no_of_channels, uint32_t* bit_depth)
 {
 	FILE* image_file = NULL;
 
@@ -2413,16 +2414,8 @@ unsigned char* LoadPNGFile(Platform* p, const char* img_path, unsigned* width, u
 		return NULL;
 	}
 #endif 
-
-	const struct handler handlers[] = {
-		{"bKGD", background_handler},
-		{"pHYs", pixelXY_handler},
-		{"PLTE", palette_generator},
-		{NULL, NULL} };
-
-	// Allocate space and read from file
-	unsigned char* buf = (unsigned char*)p->Alloc(sizeof(char) * MAX_SIZE);
-	unsigned size = fread(buf, 1, MAX_SIZE, image_file);
+	uint8_t* buf = (uint8_t*)p->Alloc(sizeof(uint8_t) * MAX_SIZE);
+	uint32_t size = (uint32_t)fread(buf, 1, MAX_SIZE, image_file);
 	if (size == MAX_SIZE)
 	{
 		// Memory leak here
@@ -2430,10 +2423,26 @@ unsigned char* LoadPNGFile(Platform* p, const char* img_path, unsigned* width, u
 		p->Free(buf);
 		return NULL;
 	}
+	auto ans =LoadPNGFromMemory(p, buf, size,width, height, no_of_channels, bit_depth);
+	fprintf(stderr,"\nWidth and height are : %u and %u.", *width, *height);
+	p->Free(buf);
+	return ans;
+}
+
+uint8_t* LoadPNGFromMemory(Platform*p,uint8_t * buf,uint32_t sz,uint32_t* width, uint32_t* height, uint32_t* no_of_channels, uint32_t * bit_depth)
+{
+	const struct handler handlers[] = {
+		{"bKGD", background_handler},
+		{"pHYs", pixelXY_handler},
+		{"PLTE", palette_generator},
+		{NULL, NULL} };
+
+	// Allocate space and read from file
+
 	// Allocate buffer for deflate stream
 	// This stream is formed by concatenating chunk of IDAT in a sequential manner
-	unsigned char* deflate_stream = (unsigned char*)p->Alloc(sizeof(unsigned char) * MAX_SIZE);
-	unsigned deflate_len = 0;
+	uint8_t* deflate_stream = (uint8_t*)p->Alloc(sizeof(uint8_t) * MAX_SIZE);
+	uint32_t deflate_len = 0;
 
 	validate_header(buf);
 	pngInfo image_info;
@@ -2488,18 +2497,18 @@ unsigned char* LoadPNGFile(Platform* p, const char* img_path, unsigned* width, u
 	// skip first and second bytes and pass it to the deflate decompressor
 
 	// Allocate space that will be used by the output uncompressed stream with max size SIZE
-	unsigned char* decomp_data = (unsigned char*)p->Alloc(sizeof(unsigned char) * MAX_SIZE);
-	unsigned decomp_len = MAX_SIZE;
+	uint8_t* decomp_data = (uint8_t*)p->Alloc(sizeof(uint8_t) * MAX_SIZE);
+	uint32_t decomp_len = MAX_SIZE;
 
 	//// It decompresses the deflate stream, writes it into decomp_data and writes total length of output stram in decomp_len integer
-	if (deflate(deflate_stream + 2, deflate_len, decomp_data, &decomp_len))
+	if (deflate(deflate_stream + 2, sz, decomp_data, &decomp_len))
 	{
 		fprintf(stderr, "Failed the deflate decompression..");
 		return NULL;
 	}
 	fprintf(stderr, "\nDecomped len is : %d.", decomp_len);
 	// Apply adler32 checksum on the decomp_data and vertify it
-	unsigned char* at_last = deflate_stream + deflate_len;
+	uint8_t* at_last = deflate_stream + deflate_len;
 	uint32_t stored_adler32 = at_last[-4] << 24 | at_last[-3] << 16 | at_last[-2] << 8 | at_last[-1]; // :D :D
 	uint32_t calc_adler32 = adler32_checksum(decomp_data, decomp_len);
 
@@ -2514,8 +2523,7 @@ unsigned char* LoadPNGFile(Platform* p, const char* img_path, unsigned* width, u
 
 	// image_info have everything that is needed by other programs
 
-	fclose(image_file);
-	p->Free(buf);
+
 	p->Free(deflate_stream);
 	p->Free(decomp_data);
 
@@ -2545,14 +2553,14 @@ unsigned char* LoadPNGFile(Platform* p, const char* img_path, unsigned* width, u
 
 struct state
 {
-	unsigned char* input;
-	unsigned curinput;
-	unsigned totinput;
-	unsigned char* output;
-	unsigned curoutput;
-	unsigned totoutput;
-	unsigned bitbuf;
-	unsigned bitcount;
+	uint8_t* input;
+	uint32_t curinput;
+	uint32_t totinput;
+	uint8_t* output;
+	uint32_t curoutput;
+	uint32_t totoutput;
+	uint32_t bitbuf;
+	uint32_t bitcount;
 };
 
 static int uncompressed(struct state*);
@@ -2566,14 +2574,14 @@ struct huffman
 	short* symbol;
 };
 
-int codes(struct state* s, struct huffman*, struct huffman*);
+static int codes(struct state* s, struct huffman*, struct huffman*);
 // Used to create huffman table
-int construct(struct huffman*, short*, int);
+static int construct(struct huffman*, short*, int);
 
 // decode binary code using generated huffman table
-int decode(struct state*, struct huffman*);
+static int decode(struct state*, struct huffman*);
 
-int deflate(unsigned char* buffer, unsigned int inlen, unsigned char* out, unsigned* outlen)
+static int deflate(uint8_t* buffer, uint32_t inlen, uint8_t* out, uint32_t* outlen)
 {
 	struct state s;
 	s.input = buffer;
